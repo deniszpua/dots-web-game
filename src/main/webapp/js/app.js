@@ -161,7 +161,7 @@ dotsGame.controller('GameController', ['$scope', '$http', 'WebSocketConnection',
             //delete pointers on positions, where dots are already placed
             var existingDots = $scope.blueDots.concat($scope.redDots);
             var freeNodes = [];
-            for (let node of $scope.pointersArray) {
+            for (var node of $scope.pointersArray) {
                 if (existingDots.indexOf(node) == -1) {
                     freeNodes.push(node);
                 }
