@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="dotsGame" data-ng-controller="GameController">
+<head>
+  <meta charset="utf-8">
+  <title>Simple dots game</title>
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/services.js"></script>
+    <style >
+        #gameField {
+            width: {{gameFieldWidth +'px'}};
+            height: {{gameFieldHeight + 'px'}};
+        }
+        .vertical {
+            height: {{cellSize +'px'}};
+        }
+        .horizontal {
+            width: {{cellSize + 'px'}};
+        }
+        .slash {
+            width: {{cellSize + 'px'}};
+            margin-left: {{'-' + cellSize + 'px'}};
+            margin-top: {{(cellSize/2 -1) + 'px'}};
+        }
+        .backslash {
+        width: {{cellSize + 'px'}};
+        margin-top: {{(cellSize/2 -1) + 'px'}};
+        }
+        .pointer {
+            width: {{((2*cellSize - (2*cellSize)%3)/3) + 'px'}};
+            height: {{((2*cellSize - (2*cellSize)%3)/3) + 'px'}};
+            margin-top: {{'-' + ((cellSize - (cellSize)%3)/3) + 'px'}};
+            margin-left: {{'-' + ((cellSize - (cellSize)%3)/3) + 'px'}};
+        }
+        /*extracted from CSS becase pseudo-class definition shoul follow main class*/
+        .pointer:hover {
+        background: url("img/pointer.png") no-repeat center;
+        }
+    </style>
+</head>
+<body>
+<h1>Dots game</h1>
+
+<!-- Game container -->
+<div id="gameField" >
+    <!-- field grid -->
+    <table>
+        <tr data-ng-repeat="i in rows">
+            <td data-ng-repeat="j in columns" ></td>
+        </tr>
+    </table>
+
+    <!-- dots -->
+    <div class="red dot" data-ng-repeat="cell in redDots"
+         style="{{computeCellPos(cell)}}"
+            ></div>
+    <div class="blue dot" data-ng-repeat="cell in blueDots"
+         style="{{computeCellPos(cell)}}"> </div>
+    <!-- circuits -->
+    <div data-ng-repeat="segment in redCircuits"
+         class="{{'red ' + getClass(segment)}}"
+         style="{{computeSegmentPos(segment)}}"
+        >
+    </div>
+    <div data-ng-repeat="segment in blueCircuits"
+         class="{{'blue ' + getClass(segment)}}"
+         style="{{computeSegmentPos(segment)}}"
+        >
+    </div>
+    <!-- move pointer -->
+    <div data-ng-repeat="point in pointersArray"
+         class="pointer"
+         style="{{computeCellPos(point)}}"
+         data-ng-click = "performMove(point)"
+        >
+    </div>
+</div>
+<!-- game status data -->
+<div class="game-flow-data">
+    {{'Game ' + (gameInProgress? 'in progress\n' : 'terminated\n')  +
+    (moveAllowed? 'your move' : "waiting for opponent's move")}}
+    </div>
+</body>
+</html>

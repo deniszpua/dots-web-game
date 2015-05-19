@@ -1,0 +1,94 @@
+body {
+    margin: 0px;
+    padding: 0px;
+}
+
+#gameField {
+    position: absolute;
+    margin-left: 10%;
+    top: 80px;
+    box-shadow: 10px 10px 5px #cccccc;
+}
+/*grid*/
+table {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+    z-index: 10;
+}
+table, td {
+    border: 1px solid lightblue;
+}
+
+/*players marks*/
+.dot {
+    width: 8px;
+    height: 8px;
+    position: absolute;
+    border-radius: 4px;
+    z-index:20;
+    margin-top: -4px;
+    margin-left: -4px;
+
+}
+.red {
+    background-color: red;
+}
+.blue {
+    background-color: blue;
+}
+
+/*Circuit elements*/
+/*vertical border*/
+.vertical {
+    width: 2px;
+    position: absolute;
+    margin-left: -1px;
+}
+/*horizontal border*/
+.horizontal {
+    height: 2px;
+    position: absolute;
+    margin-top: -1px;
+}
+/*Slash Border*/
+.slash {
+    height: 3px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+
+    /*Transformation*/
+    -ms-transform: skewY(-45deg);
+    -webkit-transform: skewY(-45deg);
+    transform: skewY(-45deg);
+    }
+ /*Backslash Border*/
+.backslash {
+    height: 3px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+
+    /*Transformation*/
+    -ms-transform: skewY(45deg);
+    -webkit-transform: skewY(45deg);
+    transform: skewY(45deg);
+    }
+
+/* pointer - do we need it? */
+.pointer {
+    position: absolute;
+    top:0;
+    left: 0;
+    z-index:30;
+}
+
+
+
+.game-flow-data {
+    margin-left: 800px;
+    width: 200px;
+    height: 400px;
+    background-color: #ccc;
+}
