@@ -3,7 +3,7 @@
 /* Services */
 
 dotsGame.factory('WebSocketConnection', ['$rootScope', function($rootScope) {
-    var ws = new WebSocket("ws://localhost:8080/dots/");
+    var ws = new WebSocket("ws://localhost:8080/game/");
     //interface methods: send(stringData), close()
 
     //event listeners

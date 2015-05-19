@@ -31,30 +31,30 @@ public class GameDataTest {
     public void setUp() throws Exception {
 
         List<Integer> redDotsList = new ArrayList<Integer>();
-        for (int i = 0; i < redDots.length; i++) {
-            redDotsList.add(redDots[i]);
+        for (int redDot : redDots) {
+            redDotsList.add(redDot);
         }
 
         List<Integer> blueDotsList = new ArrayList<Integer>();
-        for (int i = 0; i < blueDots.length; i++) {
-            blueDotsList.add(blueDots[i]);
+        for (int blueDot : blueDots) {
+            blueDotsList.add(blueDot);
         }
 
 
         List<List<Integer>> redCircuitsList = new ArrayList<List<Integer>>();
-        for (int i = 0; i < redCircuits.length; i++) {
+        for (int[] redCircuit : redCircuits) {
             List<Integer> list = new ArrayList<Integer>();
-            for (int j = 0; j < redCircuits[i].length; j++) {
-                list.add(redCircuits[i][j]);
+            for (int aRedCircuit : redCircuit) {
+                list.add(aRedCircuit);
             }
             redCircuitsList.add(list);
         }
 
         List<List<Integer>> blueCircuitsList = new ArrayList<List<Integer>>();
-        for (int i = 0; i < blueCircuits.length; i++) {
+        for (int[] blueCircuit : blueCircuits) {
             List<Integer> list = new ArrayList<Integer>();
-            for (int j = 0; j < blueCircuits[i].length; j++) {
-                list.add(blueCircuits[i][j]);
+            for (int aBlueCircuit : blueCircuit) {
+                list.add(aBlueCircuit);
             }
             blueCircuitsList.add(list);
         }
