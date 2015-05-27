@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @ServerEndpoint(value = "/msg")
 public class WebsocketEndpoint {
@@ -28,8 +30,12 @@ public class WebsocketEndpoint {
     public void start(Session session) {
         this.session = session;
         connections.add(this);
-        String message = String.format("* %s %s", nickname, "has joined.");
-        broadcast(message);
+        Logger logger = Logger.getGlobal();
+        logger.log(Level.INFO, String.format("Player %s connected", nickname));
+        if (connections.size() == 2) {
+            //Start new game
+            logger.log(Level.INFO, "New game started");
+        }
     }
 
 
@@ -38,13 +44,24 @@ public class WebsocketEndpoint {
         connections.remove(this);
         String message = String.format("* %s %s",
                 nickname, "has disconnected.");
-        broadcast(message);
+        Logger.getGlobal().info(message);
     }
 
 
     @OnMessage
     public void incoming(String message) {
-        broadcast(message + " message recieved!");
+        Logger.getGlobal().info(String.format("Message %s recieved", message));
+        broadcast("{" +
+                "\"redDots\":[12, 22, 24, 26, 34], \"blueDots\":[15, 23, 25, 27, 36, 37], " +
+                "\"redCircuits\":[12, 24, 34, 22], \"blueCircuits\":[15, 27, 37, 36, 25], " +
+                "\"gameInProgress\":true, \"moveAllowed\":true"
+                +"}");
+        /**
+         *$scope.redCircuits  = convertCircuitFormat(data.redCircuits);
+         $scope.blueCircuits = convertCircuitFormat(data.blueCircuits);
+         $scope.gameInProgress = data.gameInProgress;
+         $scope.moveAllowed = data.moveAllowed;
+         */
     }
 
     @OnError
@@ -67,9 +84,17 @@ public class WebsocketEndpoint {
                     // Ignore
                 }
                 String message = String.format("* %s %s",
-                        client.nickname, "has been disconnected.");
+                        client.getNickname(), "has been disconnected.");
                 broadcast(message);
             }
         }
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public Session getSession() {
+        return session;
     }
 }

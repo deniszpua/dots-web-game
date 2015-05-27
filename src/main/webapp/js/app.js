@@ -36,28 +36,19 @@ dotsGame.controller('GameController', ['$scope', '$http', 'WebSocketConnection',
         $scope.gameInProgress = true;
 	});
 
-    //Update game data after recieving it from webSocket
+    //Update game data after receiving it from webSocket
     $scope.$on('gameDataChanged', function(event, message) {
-        console.log('Recieved server response: ' + message.data)
-        /*var data = angular.fromJSON(message);
-        //TODO modify updateGameData after writing server stub!
-        $scope.redDots = data.redDots;
-        $scope.blueDots = data.blueDots;
-        $scope.redCircuits  = convertCircuitFormat(data.redCircuits);
-        $scope.blueCircuits = convertCircuitFormat(data.blueCircuits);
-        $scope.gameInProgress = data.gameInProgress;
-        $scope.moveAllowed = data.moveAllowed;*/
+        updateGameView(angular.fromJson(message.data));
+        console.log('View data changed: ' + message.data)
 
     });
     //Players move handler
     $scope.performMove = function(cellNumber) {
 
         if ($scope.moveAllowed) {
-            console.log('Performed move: ' + cellNumber);
             $scope.moveAllowed = false;
             ws.sendMove(cellNumber);
-            $scope.redDots.push(cellNumber);
-            updateGameView();
+            console.log('Performed move: ' + cellNumber);
         }
     }
 	//Position dots on game field
@@ -143,39 +134,30 @@ dotsGame.controller('GameController', ['$scope', '$http', 'WebSocketConnection',
         return adjacentVertices;
     }
 
-    //Update game data from server
-    //TODO rewrite data updating via WebSocket
-    var updateGameView = function() {
-        /*function should retrieve data from message
-        that will be asynchronously retrieved from server
-        by appropriate service and appropriate message will be
-        sent to subsribers. So controller should be registered
-        as listener and call function, that will extract data
-        from server message*/
-        $http.get('games/data.json').success(function(data) {
-            //current game data
-            $scope.redDots = data.redDots;
-            $scope.blueDots = data.blueDots;
-            $scope.redCircuits  = convertCircuitFormat(data.redCircuits);
-            $scope.blueCircuits = convertCircuitFormat(data.blueCircuits);
+    //Update view based on data received from server
+    var updateGameView = function(data) {
+        //player's dots and circuits
+        $scope.redDots = data.redDots;
+        $scope.blueDots = data.blueDots;
+        $scope.redCircuits  = convertCircuitFormat(data.redCircuits);
+        $scope.blueCircuits = convertCircuitFormat(data.blueCircuits);
 
-            //delete pointers on positions, where dots are already placed
-            var existingDots = $scope.blueDots.concat($scope.redDots);
-            var freeNodes = [];
-            for (var node of $scope.pointersArray) {
-                if (existingDots.indexOf(node) == -1) {
-                    freeNodes.push(node);
-                }
+        //delete pointers on positions, where dots are already placed
+        var existingDots = $scope.blueDots.concat($scope.redDots);
+        var freeNodes = [];
+        for (var node of $scope.pointersArray) {
+            if (existingDots.indexOf(node) == -1) {
+                freeNodes.push(node);
             }
-            $scope.pointersArray = freeNodes;
-        });
+        }
+        $scope.pointersArray = freeNodes;
+
+        //set game flow flags
+        $scope.gameInProgress = data.gameInProgress;
+        $scope.moveAllowed = data.moveAllowed;
+        $scope.$apply();
+        console.log('View update finished');
     }
 
-    //Send players move to server
-    //TODO after implementing websocket service
-    var sendMoveResult = function(cellNumber) {
-        console.log('  Send move ' + cellNumber + ' to the server');
-        /* send cellNumber to server via WebSocket */
-        ws.sendMove(cellNumber);
-    }
+
 }]);

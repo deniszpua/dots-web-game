@@ -8,6 +8,7 @@ dotsGame.factory('WebSocketConnection', ['$rootScope', function($rootScope) {
 
     //event listeners
     ws.onopen = function(event){
+        console.log('    Websocket connection established');
         if(event.data === undefined)
             return;
 
@@ -15,17 +16,20 @@ dotsGame.factory('WebSocketConnection', ['$rootScope', function($rootScope) {
     };
 
     ws.onmessage = function(message){
+        console.log("Websocket connection received message from sever:", message);
         $rootScope.$broadcast('gameDataChanged', message);
     };
 
     ws.onclose = function(event){
         //display connection status
+        console.log('   Websocket connection closed');
+        ws.sendMove = null;
     };
 
     ws.sendMove = function(cellNumber) {
-        var message;
-        message = '{"lastMove":' + cellNumber + ' }';
-        ws.send(message);
+        var move = {};
+        move.cellNumber = cellNumber;
+        ws.send(angular.toJson(move));
     }
 
     return ws;

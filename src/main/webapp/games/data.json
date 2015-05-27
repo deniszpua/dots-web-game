@@ -1,8 +1,0 @@
-{
-  "gameInProgress": true,
-  "moveAllowed": true,
-  "redDots": [12, 22, 24, 26, 34],
-  "blueDots": [15, 23, 25, 27, 36, 37],
-  "redCircuits": [12, 24, 34, 22], 
-  "blueCircuits": [15, 27, 37, 36, 25]
-}
