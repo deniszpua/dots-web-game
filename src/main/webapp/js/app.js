@@ -38,14 +38,15 @@ dotsGame.controller('GameController', ['$scope', '$http', 'WebSocketConnection',
 
     //Update game data after recieving it from webSocket
     $scope.$on('gameDataChanged', function(event, message) {
-        var data = angular.fromJSON(message);
+        console.log('Recieved server response: ' + message.data)
+        /*var data = angular.fromJSON(message);
         //TODO modify updateGameData after writing server stub!
         $scope.redDots = data.redDots;
         $scope.blueDots = data.blueDots;
         $scope.redCircuits  = convertCircuitFormat(data.redCircuits);
         $scope.blueCircuits = convertCircuitFormat(data.blueCircuits);
         $scope.gameInProgress = data.gameInProgress;
-        $scope.moveAllowed = data.moveAllowed;
+        $scope.moveAllowed = data.moveAllowed;*/
 
     });
     //Players move handler
