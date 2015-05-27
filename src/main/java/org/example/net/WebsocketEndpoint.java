@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class WebsocketEndpoint {
 
 
-    private static final String GUEST_PREFIX = "Player ";
+    private static final String GUEST_PREFIX = "Player";
     private static final AtomicInteger connectionIds = new AtomicInteger(0);
     private static final Set<WebsocketEndpoint> connections =
             new CopyOnWriteArraySet<>();
@@ -31,7 +31,7 @@ public class WebsocketEndpoint {
         this.session = session;
         connections.add(this);
         Logger logger = Logger.getGlobal();
-        logger.log(Level.INFO, String.format("Player %s connected", nickname));
+        logger.log(Level.INFO, String.format("%s connected", nickname));
         if (connections.size() == 2) {
             //Start new game
             logger.log(Level.INFO, "New game started");

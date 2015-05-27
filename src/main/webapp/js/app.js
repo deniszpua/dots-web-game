@@ -32,8 +32,8 @@ dotsGame.controller('GameController', ['$scope', '$http', 'WebSocketConnection',
         var idx = $scope.gridHeight * $scope.gridWidth;
         while (idx-- > 0) $scope.pointersArray[idx] = idx;
 
-        $scope.moveAllowed = true;
-        $scope.gameInProgress = true;
+        $scope.moveAllowed = false;
+        $scope.gameInProgress = false;
 	});
 
     //Update game data after receiving it from webSocket
@@ -136,21 +136,26 @@ dotsGame.controller('GameController', ['$scope', '$http', 'WebSocketConnection',
 
     //Update view based on data received from server
     var updateGameView = function(data) {
-        //player's dots and circuits
-        $scope.redDots = data.redDots;
-        $scope.blueDots = data.blueDots;
-        $scope.redCircuits  = convertCircuitFormat(data.redCircuits);
-        $scope.blueCircuits = convertCircuitFormat(data.blueCircuits);
 
-        //delete pointers on positions, where dots are already placed
-        var existingDots = $scope.blueDots.concat($scope.redDots);
-        var freeNodes = [];
-        for (var node of $scope.pointersArray) {
-            if (existingDots.indexOf(node) == -1) {
-                freeNodes.push(node);
+        //update board only if appropriate data present
+        if ($scope.redDots != null) {
+            //player's dots and circuits
+            $scope.redDots = data.redDots;
+            $scope.blueDots = data.blueDots;
+            $scope.redCircuits  = convertCircuitFormat(data.redCircuits);
+            $scope.blueCircuits = convertCircuitFormat(data.blueCircuits);
+
+            //delete pointers on positions, where dots are already placed
+            var existingDots = $scope.blueDots.concat($scope.redDots);
+            var freeNodes = [];
+            for (var node of $scope.pointersArray) {
+                if (existingDots.indexOf(node) == -1) {
+                    freeNodes.push(node);
+                }
             }
+            $scope.pointersArray = freeNodes;
         }
-        $scope.pointersArray = freeNodes;
+
 
         //set game flow flags
         $scope.gameInProgress = data.gameInProgress;
