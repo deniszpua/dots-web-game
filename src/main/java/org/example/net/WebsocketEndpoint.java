@@ -33,8 +33,16 @@ public class WebsocketEndpoint {
         Logger logger = Logger.getGlobal();
         logger.log(Level.INFO, String.format("%s connected", nickname));
         if (connections.size() == 2) {
-            //Start new game
             logger.log(Level.INFO, "New game started");
+            WebsocketEndpoint[] players = connections.toArray(new WebsocketEndpoint[0]);
+            try {
+                players[0].getSession().getBasicRemote().sendText("{" +
+                        "\"gameInProgress\":true, \"moveAllowed\":true" +
+                        "}");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //Start new game
         }
     }
 

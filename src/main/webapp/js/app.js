@@ -138,7 +138,7 @@ dotsGame.controller('GameController', ['$scope', '$http', 'WebSocketConnection',
     var updateGameView = function(data) {
 
         //update board only if appropriate data present
-        if ($scope.redDots != null) {
+        if (data.redDots != null) {
             //player's dots and circuits
             $scope.redDots = data.redDots;
             $scope.blueDots = data.blueDots;
