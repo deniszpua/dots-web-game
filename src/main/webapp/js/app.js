@@ -175,5 +175,6 @@ dotsGame.controller('GameController', ['$scope', '$http', 'WebSocketConnection',
     var sendMoveResult = function(cellNumber) {
         console.log('  Send move ' + cellNumber + ' to the server');
         /* send cellNumber to server via WebSocket */
+        ws.sendMove(cellNumber);
     }
 }]);
