@@ -1,5 +1,6 @@
 package org.example.net;
 
+import org.example.net.messages.GameViewUpdate;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,8 +13,8 @@ import static org.junit.Assert.*;
 /**
  * Created by development on 08.05.15.
  */
-public class GameDataTest {
-    GameData gameData;
+public class GameViewUpdateTest {
+    GameViewUpdate gameViewUpdate;
     int[] redDots = {0, 2, 4, 6, 8, 10};
     int[] blueDots = {10, 12, 14, 16, 18, 20};
     int[][] redCircuits = {
@@ -60,8 +61,12 @@ public class GameDataTest {
         }
 
 
-        gameData = new GameData(true, redDotsList,
-                blueDotsList, redCircuitsList, blueCircuitsList);
+        gameViewUpdate = new GameViewUpdate();
+        gameViewUpdate.setMoveAllowed(true);
+        gameViewUpdate.setRedDots(redDotsList);
+        gameViewUpdate.setBlueDots(blueDotsList);
+        gameViewUpdate.setRedCircuits(redCircuitsList);
+        gameViewUpdate.setBlueCircuits(blueCircuitsList);
 
 
     }
@@ -69,14 +74,14 @@ public class GameDataTest {
     @Test
     public void testGetRedDots() throws Exception {
         for (int i = 0; i < redDots.length; i++) {
-            assertEquals(redDots[i], gameData.getRedDots()[i]);
+            assertEquals(redDots[i], gameViewUpdate.getRedDots()[i]);
         }
     }
 
     @Test
     public void testGetBlueDots() throws Exception {
         for (int i = 0; i < blueDots.length; i++) {
-            assertEquals(blueDots[i], gameData.getBlueDots()[i]);
+            assertEquals(blueDots[i], gameViewUpdate.getBlueDots()[i]);
         }
 
     }
@@ -86,7 +91,7 @@ public class GameDataTest {
         for (int i = 0; i < redCircuits.length; i++) {
             for (int j = 0; j < redCircuits[i].length; j++) {
 
-                assertEquals(redCircuits[i][j], gameData.getRedCircuits()[i][j]);
+                assertEquals(redCircuits[i][j], gameViewUpdate.getRedCircuits()[i][j]);
             }
         }
 
@@ -97,7 +102,7 @@ public class GameDataTest {
         for (int i = 0; i < blueCircuits.length; i++) {
             for (int j = 0; j < blueCircuits[i].length; j++) {
 
-                assertEquals(blueCircuits[i][j], gameData.getBlueCircuits()[i][j]);
+                assertEquals(blueCircuits[i][j], gameViewUpdate.getBlueCircuits()[i][j]);
             }
         }
 

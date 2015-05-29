@@ -1,25 +1,34 @@
 package org.example.net;
 
+import org.example.main.Launcher;
+import org.example.main.LauncherBuilder;
+
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @ServerEndpoint(value = "/msg")
-public class WebsocketEndpoint {
+public class WebsocketEndpoint implements GameConnection {
 
 
     private static final String GUEST_PREFIX = "Player";
     private static final AtomicInteger connectionIds = new AtomicInteger(0);
-    private static final Set<WebsocketEndpoint> connections =
-            new CopyOnWriteArraySet<>();
+    private static final List<WebsocketEndpoint> connections =
+            new CopyOnWriteArrayList<>();
+    private static final Set<Launcher> games = new CopyOnWriteArraySet<>();
+    public static final String ERROR_ON_SOCKET_CONNECTION = "Error on socket %s connection.";
+    public static final String PLAYER_HAS_DISCONNECTED = "Player %s has disconnected.";
 
     private final String nickname;
     private Session session;
+    private MessagesListener listener;
 
     public WebsocketEndpoint() {
         nickname = GUEST_PREFIX + connectionIds.getAndIncrement();
@@ -32,7 +41,13 @@ public class WebsocketEndpoint {
         connections.add(this);
         Logger logger = Logger.getGlobal();
         logger.log(Level.INFO, String.format("%s connected", nickname));
+
+        //TODO resolve concurrency issues
         if (connections.size() == 2) {
+            LauncherBuilder builder = LauncherBuilder.getBuilder();
+            games.add(builder.startNewGame(connections));
+            connections.clear();
+
             logger.log(Level.INFO, "New game started");
             WebsocketEndpoint[] players = connections.toArray(new WebsocketEndpoint[0]);
             try {
@@ -43,6 +58,7 @@ public class WebsocketEndpoint {
                 e.printStackTrace();
             }
             //Start new game
+
         }
     }
 
@@ -50,54 +66,29 @@ public class WebsocketEndpoint {
     @OnClose
     public void end() {
         connections.remove(this);
-        String message = String.format("* %s %s",
-                nickname, "has disconnected.");
+        String message = String.format(PLAYER_HAS_DISCONNECTED,nickname);
         Logger.getGlobal().info(message);
+        //notify listener, that player have closed connection
+        listener.connectionTerminated(message, nickname);
     }
 
 
     @OnMessage
     public void incoming(String message) {
         Logger.getGlobal().info(String.format("Message %s recieved", message));
-        broadcast("{" +
-                "\"redDots\":[12, 22, 24, 26, 34], \"blueDots\":[15, 23, 25, 27, 36, 37], " +
-                "\"redCircuits\":[12, 24, 34, 22], \"blueCircuits\":[15, 27, 37, 36, 25], " +
-                "\"gameInProgress\":true, \"moveAllowed\":true"
-                +"}");
-        /**
-         *$scope.redCircuits  = convertCircuitFormat(data.redCircuits);
-         $scope.blueCircuits = convertCircuitFormat(data.blueCircuits);
-         $scope.gameInProgress = data.gameInProgress;
-         $scope.moveAllowed = data.moveAllowed;
-         */
+        //notify listener
+        listener.moveReceived(message, nickname);
     }
 
     @OnError
     public void onError(Throwable t) throws Throwable {
-        t.printStackTrace();
+        Logger.getGlobal().info(String.format(ERROR_ON_SOCKET_CONNECTION, nickname));
+        listener.connectionTerminated(String.format(ERROR_ON_SOCKET_CONNECTION, nickname), nickname);
+        connections.remove(this);
     }
 
 
-    private static void broadcast(String msg) {
-        for (WebsocketEndpoint client : connections) {
-            try {
-                synchronized (client) {
-                    client.session.getBasicRemote().sendText(msg);
-                }
-            } catch (IOException e) {
-                connections.remove(client);
-                try {
-                    client.session.close();
-                } catch (IOException e1) {
-                    // Ignore
-                }
-                String message = String.format("* %s %s",
-                        client.getNickname(), "has been disconnected.");
-                broadcast(message);
-            }
-        }
-    }
-
+    @Override
     public String getNickname() {
         return nickname;
     }
@@ -105,4 +96,17 @@ public class WebsocketEndpoint {
     public Session getSession() {
         return session;
     }
+
+    @Override
+    public void sendMessage (String message) throws IOException{
+
+        session.getBasicRemote().sendText(message);
+
+    }
+
+    @Override
+    public void addListener(MessagesListener listener) {
+        this.listener = listener;
+    }
+
 }
