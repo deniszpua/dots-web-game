@@ -1,5 +1,6 @@
 package org.example.net.messages;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -86,5 +87,18 @@ public class GameViewUpdate {
             result[i++] = toArray(circuit);
         }
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "GameViewUpdate{" +
+                "gameInProgress=" + gameInProgress +
+                ", moveAllowed=" + moveAllowed +
+                ", redDots=" + Arrays.toString(redDots) +
+                ", blueDots=" + Arrays.toString(blueDots) +
+                ", redCircuits=" + Arrays.toString(redCircuits) +
+                ", blueCircuits=" + Arrays.toString(blueCircuits) +
+                ", infoMessage='" + infoMessage + '\'' +
+                '}';
     }
 }

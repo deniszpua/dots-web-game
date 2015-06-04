@@ -44,19 +44,13 @@ public class WebsocketEndpoint implements GameConnection {
 
         //TODO resolve concurrency issues
         if (connections.size() == 2) {
+            Logger.getGlobal().info("Getting game builder...");
             LauncherBuilder builder = LauncherBuilder.getBuilder();
+            Logger.getGlobal().info("Building new game...");
             games.add(builder.startNewGame(connections));
             connections.clear();
 
             logger.log(Level.INFO, "New game started");
-            WebsocketEndpoint[] players = connections.toArray(new WebsocketEndpoint[0]);
-            try {
-                players[0].getSession().getBasicRemote().sendText("{" +
-                        "\"gameInProgress\":true, \"moveAllowed\":true" +
-                        "}");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             //Start new game
 
         }
@@ -83,8 +77,9 @@ public class WebsocketEndpoint implements GameConnection {
     @OnError
     public void onError(Throwable t) throws Throwable {
         Logger.getGlobal().info(String.format(ERROR_ON_SOCKET_CONNECTION, nickname));
-        listener.connectionTerminated(String.format(ERROR_ON_SOCKET_CONNECTION, nickname), nickname);
-        connections.remove(this);
+        System.out.println(t.getMessage());
+//        listener.connectionTerminated(String.format(ERROR_ON_SOCKET_CONNECTION, nickname), nickname);
+//        connections.remove(this);
     }
 
 
@@ -100,7 +95,9 @@ public class WebsocketEndpoint implements GameConnection {
     @Override
     public void sendMessage (String message) throws IOException{
 
+        Logger.getGlobal().info("Trying to send message:\n" + message);
         session.getBasicRemote().sendText(message);
+        Logger.getGlobal().info("Message\n" + message + "\nhave been sent succesfully!");
 
     }
 

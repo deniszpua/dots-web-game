@@ -59,15 +59,13 @@
     <div class="blue dot" data-ng-repeat="cell in blueDots"
          style="{{computeCellPos(cell)}}"> </div>
     <!-- circuits -->
-    <div data-ng-repeat="segment in redCircuits"
-         class="{{'red ' + getClass(segment)}}"
-         style="{{computeSegmentPos(segment)}}"
-        >
+    <div class="{{'red ' + getClass(segment)}}"
+         data-ng-repeat="segment in redCircuits"
+         style="{{computeSegmentPos(segment)}}">
     </div>
-    <div data-ng-repeat="segment in blueCircuits"
-         class="{{'blue ' + getClass(segment)}}"
-         style="{{computeSegmentPos(segment)}}"
-        >
+    <div class="{{'blue ' + getClass(segment)}}"
+         data-ng-repeat="segment in blueCircuits"
+         style="{{computeSegmentPos(segment)}}">
     </div>
     <!-- move pointer -->
     <div data-ng-repeat="point in pointersArray"

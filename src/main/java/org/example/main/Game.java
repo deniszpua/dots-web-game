@@ -5,16 +5,21 @@ import org.example.model.GameGrid;
 import org.example.model.Player;
 import org.example.net.GameConnection;
 import org.example.net.messages.GameViewUpdate;
+import org.example.net.messages.MessageFromPlayer;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * Created by development on 04.05.15.
  */
 public class Game implements Launcher {
 
-    public static final int MOVES_FIRST = Player.RED_PLAYER;
+    public static final String MOVES_FIRST = "Player 0";
     private Map<String, GameConnection> players;
     private List<String> playerRoles;
     private Set<GameConnection> watchers;
@@ -29,51 +34,39 @@ public class Game implements Launcher {
     @Override
     public void startGame() {
 
-        //Subscribe to player's messages
-        for (GameConnection publisher : players.values()) {
-            publisher.addListener(this);
-        }
-
-        //Create bimap to find players role by their nicknames and vice versa
-        playerRoles = new ArrayList<>(Math.max(Player.BLUE_PLAYER, Player.RED_PLAYER));
-        int role = Player.RED_PLAYER;
-        for (String nickname : players.keySet()) {
-            playerRoles.add(role, nickname);
-            role = Player.opponent(role);
-        }
+        Logger.getGlobal().info("Starting new game....");
 
         //send initial BoardPosition to watchers
         //TODO extract separate publisher service that will send messages and handle all connection stuff
-        GameViewUpdate data = getCurrentGameDataSnapshot();
-        data.setInfoMessage("Game started");
-        String message = null;
-        try {
-            message = toJsonString(data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        for (GameConnection watcher : watchers) {
-            try {
-                watcher.sendMessage(message);
-            } catch (IOException e) {
-                e.printStackTrace();
-                watchers.remove(watcher);
-            }
-        }
+        broadCastView("Game started", true);
+        Logger.getGlobal().info("Initial gameboard sent");
 
         //Allow first player to move
 
-        String redNickname = playerRoles.get(MOVES_FIRST);
-        try {
-            players.get(redNickname).sendMessage("{moveAllowed: true}");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendMoveRequest(MOVES_FIRST);
 
 
     }
 
+    private void sendMoveRequest(String playerNickname) {
+        boolean sent = false;
+        try {
+            for (GameConnection player : watchers) {
+                if (!sent) {
+                    Logger.getGlobal().info("Sending move request to " + player.getNickname());
+                    player.sendMessage("{\"moveAllowed\":true}");
+                    sent = true;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private String toJsonString(GameViewUpdate data) throws IOException {
+        if (mapper == null) {
+            mapper = new ObjectMapper();
+        }
         return mapper.writeValueAsString(data);
     }
 
@@ -104,6 +97,10 @@ public class Game implements Launcher {
     public void setPlayerMessagesPublishers(HashMap<String, GameConnection> players) {
         this.players = players;
 
+        //Subscribe to player's messages
+        for (GameConnection publisher : players.values()) {
+            publisher.addListener(this);
+        }
     }
 
     @Override
@@ -120,23 +117,63 @@ public class Game implements Launcher {
     }
 
     @Override
-    public void moveReceived(String message, String nickname) {
+    public void moveReceived(String messageString, String nickname) {
 
+        //TODO
         // parse json string to message object
+        MessageFromPlayer messageObject = null;
+        try {
+            messageObject = mapper.readValue(messageString, MessageFromPlayer.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if ((messageObject != null) && messageObject.isGameTerminated()) {
+            broadCastView(String.format("Game terminated by %s!\n", nickname),
+                    false);
+            return;
+        }
 
         //if game not terminated by the player, check if it was senders turn
-        // (client could be cheated to perform moves without waiting for permission)
+        //(client could be cheated to perform moves without waiting for permission)
+        if (playerRoles.indexOf(nickname) == currentPlayer) {
+            // add move to game grid, process it and send updated view to watchers
+            gameGrid.addDot(currentPlayer, messageObject.getNewDotPosition());
+            broadCastView(
+                    String.format("Player %s performed moved at %d", nickname, messageObject.getNewDotPosition()),
+                    true
+            );
+            // if game not finished - switch player and send invitation to move
+            switchCurrentPlayer();
+            sendMoveRequest(playerRoles.get(currentPlayer));
 
-        // add move to game grid, process it and send updated view to watchers
-
-        // if game not finished - switch player and send invitation to move
+        }
 
 
+
+    }
+
+    private void broadCastView(String infoMessage, boolean gameInProgress) {
+        Logger.getGlobal().info("Preparing initial game view");
+        GameViewUpdate data = getCurrentGameDataSnapshot();
+        data.setGameInProgress(false);
+        data.setInfoMessage(infoMessage);
+
+        Logger.getGlobal().info("Sendining initial board position:\n" + data);
+        for (GameConnection watcher : watchers) {
+            try {
+                watcher.sendMessage(toJsonString(data));
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+        }
     }
 
     @Override
     public void connectionTerminated(String message, String nickname) {
 
+        //TODO
         //remove  player from watcher list and send updated game view to watchers
 
     }
