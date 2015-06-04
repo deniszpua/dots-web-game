@@ -8,10 +8,7 @@ import org.example.net.messages.GameViewUpdate;
 import org.example.net.messages.MessageFromPlayer;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -19,17 +16,27 @@ import java.util.logging.Logger;
  */
 public class Game implements Launcher {
 
-    public static final String MOVES_FIRST = "Player 0";
     private Map<String, GameConnection> players;
-    private List<String> playerRoles;
     private Set<GameConnection> watchers;
 
-    //gameData fields
     private GameGrid gameGrid;
-    int currentPlayer;
+    String currentPlayer;
+    String redPlayerNickname;
+    String bluePlayerNickname;
 
     //Helper jaxon object
     ObjectMapper mapper = new ObjectMapper();
+
+    @Override
+    public void init() {
+        List<String> nicknames = new ArrayList<>(players.keySet());
+        assert (nicknames.size() == 2);
+        redPlayerNickname = nicknames.get(0);
+        bluePlayerNickname = nicknames.get(1);
+        currentPlayer = redPlayerNickname;
+        Logger.getGlobal().info("Red player nickname is " + redPlayerNickname
+        + ". Blue player nickname is " + bluePlayerNickname + ".\n");
+    }
 
     @Override
     public void startGame() {
@@ -43,19 +50,16 @@ public class Game implements Launcher {
 
         //Allow first player to move
 
-        sendMoveRequest(MOVES_FIRST);
+        sendMoveRequest(currentPlayer);
 
 
     }
 
     private void sendMoveRequest(String playerNickname) {
-        boolean sent = false;
         try {
             for (GameConnection player : watchers) {
-                if (!sent) {
-                    Logger.getGlobal().info("Sending move request to " + player.getNickname());
+                if (player.getNickname().equals(playerNickname)) {
                     player.sendMessage("{\"moveAllowed\":true}");
-                    sent = true;
                 }
             }
         } catch (IOException e) {
@@ -71,7 +75,8 @@ public class Game implements Launcher {
     }
 
     void switchCurrentPlayer() {
-        currentPlayer = Player.opponent(currentPlayer);
+        currentPlayer = (currentPlayer.equals(redPlayerNickname)) ?
+                bluePlayerNickname : redPlayerNickname;
     }
 
 
@@ -88,19 +93,10 @@ public class Game implements Launcher {
         return data;
     }
 
-    //helper method for unit test
-    public int getCurrentPlayer() {
-        return currentPlayer;
-    }
-
     @Override
     public void setPlayerMessagesPublishers(HashMap<String, GameConnection> players) {
         this.players = players;
 
-        //Subscribe to player's messages
-        for (GameConnection publisher : players.values()) {
-            publisher.addListener(this);
-        }
     }
 
     @Override
@@ -119,8 +115,10 @@ public class Game implements Launcher {
     @Override
     public void moveReceived(String messageString, String nickname) {
 
-        //TODO
         // parse json string to message object
+        Logger.getGlobal().info(
+                String.format("Message %s received from %s\n", messageString, nickname)
+        );
         MessageFromPlayer messageObject = null;
         try {
             messageObject = mapper.readValue(messageString, MessageFromPlayer.class);
@@ -136,30 +134,40 @@ public class Game implements Launcher {
 
         //if game not terminated by the player, check if it was senders turn
         //(client could be cheated to perform moves without waiting for permission)
-        if (playerRoles.indexOf(nickname) == currentPlayer) {
+        if (nickname.equals(currentPlayer)) {
             // add move to game grid, process it and send updated view to watchers
-            gameGrid.addDot(currentPlayer, messageObject.getNewDotPosition());
+            Logger.getGlobal().info(
+                    String.format("Adding move at point %d to board",
+                            messageObject.getCellNumber())
+            );
+            gameGrid.addDot(getPlayerIndex(currentPlayer), messageObject.getCellNumber());
             broadCastView(
-                    String.format("Player %s performed moved at %d", nickname, messageObject.getNewDotPosition()),
+                    String.format("Player %s performed moved at %d", nickname, messageObject.getCellNumber()),
                     true
             );
             // if game not finished - switch player and send invitation to move
             switchCurrentPlayer();
-            sendMoveRequest(playerRoles.get(currentPlayer));
-
+            sendMoveRequest(currentPlayer);
         }
-
-
+        else {
+            Logger.getGlobal().info(
+                    String.format("Message was recieved from %s, but current player is %s%n",
+                            nickname, currentPlayer)
+            );
+        }
 
     }
 
+    private int getPlayerIndex(String currentPlayer) {
+        return (currentPlayer.equals(redPlayerNickname))?
+                Player.RED_PLAYER : Player.BLUE_PLAYER;
+    }
+
     private void broadCastView(String infoMessage, boolean gameInProgress) {
-        Logger.getGlobal().info("Preparing initial game view");
         GameViewUpdate data = getCurrentGameDataSnapshot();
         data.setGameInProgress(false);
         data.setInfoMessage(infoMessage);
 
-        Logger.getGlobal().info("Sendining initial board position:\n" + data);
         for (GameConnection watcher : watchers) {
             try {
                 watcher.sendMessage(toJsonString(data));

@@ -69,15 +69,14 @@ public class WebsocketEndpoint implements GameConnection {
 
     @OnMessage
     public void incoming(String message) {
-        Logger.getGlobal().info(String.format("Message %s recieved", message));
+        Logger.getGlobal().info(String.format("Message %s recieved from %s\n", message, nickname));
         //notify listener
         listener.moveReceived(message, nickname);
     }
 
     @OnError
     public void onError(Throwable t) throws Throwable {
-        Logger.getGlobal().info(String.format(ERROR_ON_SOCKET_CONNECTION, nickname));
-        System.out.println(t.getMessage());
+        Logger.getGlobal().severe(String.format(ERROR_ON_SOCKET_CONNECTION, nickname));
 //        listener.connectionTerminated(String.format(ERROR_ON_SOCKET_CONNECTION, nickname), nickname);
 //        connections.remove(this);
     }
@@ -95,9 +94,8 @@ public class WebsocketEndpoint implements GameConnection {
     @Override
     public void sendMessage (String message) throws IOException{
 
-        Logger.getGlobal().info("Trying to send message:\n" + message);
         session.getBasicRemote().sendText(message);
-        Logger.getGlobal().info("Message\n" + message + "\nhave been sent succesfully!");
+        Logger.getGlobal().info("Message\n" + message + "\nhave been sent to" + nickname + "!");
 
     }
 

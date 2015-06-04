@@ -48,6 +48,7 @@ public class LauncherBuilder {
 
         launcher.setGameWatchers(new HashSet<GameConnection>(playerConnections));
         Logger.getGlobal().info("New game board and connections initialized!");
+        launcher.init();
 
 
         launcher.startGame();

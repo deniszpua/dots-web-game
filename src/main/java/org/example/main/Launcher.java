@@ -24,5 +24,7 @@ public interface Launcher extends MessagesListener {
      */
     void startGame();
 
+    void init();
+
 
 }

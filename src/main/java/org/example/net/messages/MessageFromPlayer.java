@@ -6,11 +6,11 @@ package org.example.net.messages;
 public class MessageFromPlayer {
 
     private boolean gameTerminated;
-    private int newDotPosition;
+    private int cellNumber;
 
     public MessageFromPlayer() {
         gameTerminated = false;
-        newDotPosition = -1;
+        cellNumber = -1;
     }
 
     /**
@@ -26,18 +26,26 @@ public class MessageFromPlayer {
      *
      * @return position, where new dot placed.
      */
-    public int getNewDotPosition() {
-        return newDotPosition;
+    public int getCellNumber() {
+        return cellNumber;
     }
 
     public void setGameTerminated(boolean gameTerminated) {
         this.gameTerminated = gameTerminated;
     }
 
-    public void setNewDotPosition(int newDotPosition) throws  IllegalArgumentException {
-        if (newDotPosition < 0) {
+    public void setCellNumber(int cellNumber) throws  IllegalArgumentException {
+        if (cellNumber < 0) {
             throw new IllegalArgumentException();
         }
-        this.newDotPosition = newDotPosition;
+        this.cellNumber = cellNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "MessageFromPlayer{" +
+                "gameTerminated=" + gameTerminated +
+                ", cellNumber=" + cellNumber +
+                '}';
     }
 }

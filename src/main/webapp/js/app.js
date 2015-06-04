@@ -117,20 +117,27 @@ dotsGame.controller('GameController', ['$scope', '$http', 'WebSocketConnection',
 	}
 
     //Convert circuits array from edge enumeration to adjacent edges pairs
-    var convertCircuitFormat = function(edgeEnumeration) {
+    var convertCircuitFormat = function(edgeEnumerationArray) {
         var adjacentVertices = [];
-        var i = 0;
-        while (++i < edgeEnumeration.length) {
-            adjacentVertices.push(
-                {from: edgeEnumeration[i - 1],
-                 to: edgeEnumeration[i]
-                 }
-                );
+        for (var j = 0;
+         j < edgeEnumerationArray.length;
+         j++) {
+            console.log('converting array ' + edgeEnumeration);
+            var edgeEnumeration = edgeEnumerationArray[j]
+            var i = 0;
+            while (++i < edgeEnumeration.length) {
+                adjacentVertices.push(
+                    {from: edgeEnumeration[i - 1],
+                     to: edgeEnumeration[i]
+                     }
+                    );
+            }
+            adjacentVertices.push({
+                from:edgeEnumeration[0],
+                to: edgeEnumeration[edgeEnumeration.length - 1]
+            });
         }
-        adjacentVertices.push({
-            from:edgeEnumeration[0],
-            to: edgeEnumeration[edgeEnumeration.length - 1]
-        });
+        console.log('vertices array ' + edgeEnumerationArray + ' converted to ' + adjacentVertices);
         return adjacentVertices;
     }
 
