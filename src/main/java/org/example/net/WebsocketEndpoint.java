@@ -1,9 +1,8 @@
 package org.example.net;
 
 import org.example.main.Launcher;
-import org.example.main.LauncherBuilder;
+import org.example.main.WebsocketP2PGameBuilder;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -19,21 +18,25 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 @ServerEndpoint(value = "/msg")
-public class WebsocketEndpoint implements GameConnection {
+public class WebsocketEndpoint {
 
-
-  private static final String GUEST_PREFIX = "Player";
+  public static final String GUEST_PREFIX = 
+      Messages.getString("WebsocketEndpoint.NICKNAME_PREFIX"); //$NON-NLS-1$
+  public static final String ERROR_ON_SOCKET_CONNECTION = 
+      Messages.getString("WebsocketEndpoint.ERROR_ON_WSOCKET"); //$NON-NLS-1$
+  public static final String PLAYER_HAS_DISCONNECTED = 
+      Messages.getString("WebsocketEndpoint.PLAYER_DISCONNECTED"); //$NON-NLS-1$
+  
   private static final AtomicInteger connectionIds = new AtomicInteger(0);
   private static final List<WebsocketEndpoint> connections =
       new CopyOnWriteArrayList<>();
   private static final Object connectionsLock = new Object();
   private static final Set<Launcher> games = new CopyOnWriteArraySet<>();
-  public static final String ERROR_ON_SOCKET_CONNECTION = "Error on socket %s connection.";
-  public static final String PLAYER_HAS_DISCONNECTED = "Player %s has disconnected.";
+  
 
   private final String nickname;
   private Session session;
-  private MessagesListener listener;
+  private WebsocketListener listener;
 
   public WebsocketEndpoint() {
     nickname = GUEST_PREFIX + connectionIds.getAndIncrement();
@@ -45,12 +48,14 @@ public class WebsocketEndpoint implements GameConnection {
     this.session = session;
     connections.add(this);
     Logger logger = Logger.getGlobal();
-    logger.info(String.format("%s connected", nickname));
+    logger.info(String.format(Messages.getString(
+        "WebsocketEndpoint.CONNECTED"), nickname
+    )); //$NON-NLS-1$
 
     //detect when second player connected and launch new game
     if (connections.size() >= 2) {
       boolean gameStarted = false;
-      LauncherBuilder builder = LauncherBuilder.getBuilder();
+      WebsocketP2PGameBuilder builder = new WebsocketP2PGameBuilder();
       synchronized (connectionsLock) {
         if (connections.size() >= 2) {
           //Start new game
@@ -60,9 +65,9 @@ public class WebsocketEndpoint implements GameConnection {
           gameStarted = true;
         }
         if (gameStarted) {
-          logger.info("Getting game builder...");
-          logger.info("Building new game...");
-          logger.info("New game started");
+          logger.info(Messages.getString(
+              "WebsocketEndpoint.NEW_GAME_STARTED"
+          )); //$NON-NLS-1$
         }
       }
     }
@@ -71,48 +76,42 @@ public class WebsocketEndpoint implements GameConnection {
 
   @OnClose
   public void end() {
-    connections.remove(this);
-    String message = String.format(PLAYER_HAS_DISCONNECTED,nickname);
-    Logger.getGlobal().info(message);
     //notify listener, that player have closed connection
-    listener.connectionTerminated(message, nickname);
+    listener.connectionTerminated();
+    Logger.getGlobal().info("Connection with " 
+        + nickname + " terminated.\n"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
 
   @OnMessage
   public void incoming(String message) {
-    Logger.getGlobal().info(String.format("Message %s recieved from %s\n", message, nickname));
     //notify listener
-    listener.moveReceived(message, nickname);
+    listener.messageReceived(message);
+    Logger.getGlobal().info(String.format(
+        Messages.getString("WebsocketEndpoint.MESSAGE_RECEIVED"), message, nickname
+    )); //$NON-NLS-1$
   }
 
   @OnError
   public void onError(Throwable throwable) throws Throwable {
-    Logger.getGlobal().severe(String.format(ERROR_ON_SOCKET_CONNECTION, nickname));
+    listener.errorOnConnection(throwable);
+    Logger.getGlobal().severe(
+        String.format(ERROR_ON_SOCKET_CONNECTION, nickname));
     throw new Throwable(throwable);
   }
 
-
-  @Override
-  public String getNickname() {
-    return nickname;
-  }
 
   public Session getSession() {
     return session;
   }
 
-  @Override
-  public void sendMessage(String message) throws IOException {
-
-    session.getBasicRemote().sendText(message);
-    Logger.getGlobal().info("Message\n" + message + "\nhave been sent to" + nickname + "!");
-
+  public void addListener(WebsocketListener listener) {
+    this.listener = listener;
   }
 
-  @Override
-  public void addListener(MessagesListener listener) {
-    this.listener = listener;
+
+  public String getNickname() {
+    return nickname;
   }
 
 }

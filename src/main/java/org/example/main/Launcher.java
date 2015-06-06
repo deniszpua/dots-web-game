@@ -1,29 +1,25 @@
 package org.example.main;
 
+import org.example.main.figurants.GameObserver;
+import org.example.main.figurants.Player;
 import org.example.model.GameGrid;
-import org.example.net.GameConnection;
-import org.example.net.MessagesListener;
 
-import java.util.HashMap;
 import java.util.Set;
 
-/**
- * Created by deniszpua on 29.05.15.
- */
-public interface Launcher extends MessagesListener {
-    /*
-    Setters for initial setup
-     */
-    void setPlayerMessagesPublishers(HashMap<String, GameConnection> players);
-    void setGameWatchers(Set<GameConnection> watchers);
+public interface Launcher extends MovesReceiver {
+
+    void setPlayerMessagesPublishers(Player[] players);
+    
+    void setGameObservers(Set<GameObserver> observers);
 
     void addGameBoard(GameGrid gameBoard);
 
-    /*
-    game launcher
-     */
     void startGame();
 
+    /**
+     * Method to perform setup that should be called before
+     * start of the game.
+     */
     void init();
 
 

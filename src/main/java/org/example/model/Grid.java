@@ -2,11 +2,9 @@ package org.example.model;
 
 import java.util.*;
 
-import static org.example.model.Player.*;
+import static org.example.model.PlayerType.*;
 
-/**
- * Created by deniszpua on 09.05.15.
- */
+
 public class Grid implements GameGrid {
     private int boardWidth;
     private int boardHeight;
@@ -28,8 +26,8 @@ public class Grid implements GameGrid {
         circuits.add(BLUE_PLAYER, new ArrayList<List<Integer>>());
         gameScore = new ArrayList<Integer>(3);
         gameScore.add(0, 0);
-        gameScore.add(Player.RED_PLAYER, 0);
-        gameScore.add(Player.BLUE_PLAYER, 0);
+        gameScore.add(PlayerType.RED_PLAYER, 0);
+        gameScore.add(PlayerType.BLUE_PLAYER, 0);
         enclosedArea = new ArrayList<Double>(3);
         for (int i = 0; i < 3; i++) {
             enclosedArea.add(0.0);
@@ -92,7 +90,7 @@ public class Grid implements GameGrid {
     private List<Circuit> findNewCircuits(int newDot, int player) {
 
         Queue<List<Integer>> pathes = new ArrayDeque<List<Integer>>();
-        for (int originNeighbour : eightNeighbours(newDot, player)) {
+        for (int originNeighbour : eightNeighbors(newDot, player)) {
             List<Integer> pathToOrigin = new ArrayList<Integer>();
             pathToOrigin.add(newDot);
             pathToOrigin.add(originNeighbour);
@@ -119,7 +117,7 @@ public class Grid implements GameGrid {
                     break;
                 }
 
-                List<Integer> neighbours = eightNeighbours(current, player);
+                List<Integer> neighbours = eightNeighbors(current, player);
                 //remove parent to current from origin
                 neighbours.remove(pathToOrigin.get(pathToOrigin.size() - 2));
                 if (neighbours.size() == 0) {
@@ -177,7 +175,7 @@ public class Grid implements GameGrid {
         //eliminate circuits, enclosed by bigger circuits
         //count opponents deactivated dots in circuits
 
-        for (int player : Player.getPlayers()) {
+        for (int player : PlayerType.getPlayers()) {
             int captiveDots = 0;
             double totalEnclosedArea = 0.0;
             for (List<Integer> circuit : circuits.get(player)) {
@@ -186,7 +184,7 @@ public class Grid implements GameGrid {
                     totalEnclosedArea += activeCircuit.getEnclosedArea();
                     for (int pos : activeCircuit.getEmbracedPositions()) {
                         if (isActive(dots[pos]) &&
-                                placedByPlayer(dots[pos], Player.opponent(player))) {
+                                placedByPlayer(dots[pos], PlayerType.opponent(player))) {
                             captiveDots++;
                             deactivate(pos);
                         }
@@ -244,10 +242,10 @@ public class Grid implements GameGrid {
 
     }
 
-    private List<Integer> eightNeighbours(int pos, int player) {
+    private List<Integer> eightNeighbors(int pos, int player) {
 
         List<Integer> neighbours = new ArrayList<Integer>();
-        //Adding neighbours clockwise
+        //Adding neighbors clockwise
         int[] rowOffsets = {-1, -1, 0, 1, 1,  1,  0, -1};
         int[] colOffsets = { 0,  1, 1, 1, 0, -1, -1, -1};
         int row = getRow(pos);

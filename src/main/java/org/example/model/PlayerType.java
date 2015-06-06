@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by development on 08.05.15.
+ * Created by deniszpua on 08.05.15.
  */
-public class Player {
+public class PlayerType {
     public static final int RED_PLAYER = 1;
     public static final int BLUE_PLAYER = 2;
 
@@ -15,7 +15,7 @@ public class Player {
     }
 
     public static List<Integer> getPlayers() {
-        return Arrays.asList(Player.RED_PLAYER, Player.BLUE_PLAYER);
+        return Arrays.asList(PlayerType.RED_PLAYER, PlayerType.BLUE_PLAYER);
     }
 
 }
