@@ -40,18 +40,28 @@ public class WebsocketEndpoint implements GameConnection {
         this.session = session;
         connections.add(this);
         Logger logger = Logger.getGlobal();
-        logger.log(Level.INFO, String.format("%s connected", nickname));
+        logger.info(String.format("%s connected", nickname));
 
-        //TODO resolve concurrency issues
-        if (connections.size() == 2) {
-            Logger.getGlobal().info("Getting game builder...");
-            LauncherBuilder builder = LauncherBuilder.getBuilder();
-            Logger.getGlobal().info("Building new game...");
-            games.add(builder.startNewGame(connections));
-            connections.clear();
-
-            logger.log(Level.INFO, "New game started");
-            //Start new game
+        //detect when second player connected and launch new game
+        if (connections.size() >= 2) {
+        	boolean gameStarted = false;
+        	LauncherBuilder builder = LauncherBuilder.getBuilder();
+          synchronized (connections) {
+            if (connections.size() >= 2) {
+              //Start new game
+              List<WebsocketEndpoint> players = connections.subList(0, 2);
+              games.add(builder.startNewGame(players));
+              connections.removeAll(players);
+              gameStarted = true;
+            }
+            if (gameStarted) {
+            	logger.info("Getting game builder...");
+            	logger.info("Building new game...");
+            	logger.info("New game started");
+				
+			}
+		  }
+      
 
         }
     }
