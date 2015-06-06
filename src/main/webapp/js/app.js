@@ -33,7 +33,8 @@ dotsGame.controller('GameController', ['$scope', '$http', 'WebSocketConnection',
         while (idx-- > 0) $scope.pointersArray[idx] = idx;
 
         $scope.moveAllowed = false;
-        $scope.gameInProgress = false;
+        $scope.gameTerminated = false;
+        $scope.infoMessage = "Waiting for an opponent";
 	});
 
     //Update game data after receiving it from webSocket
@@ -54,7 +55,8 @@ dotsGame.controller('GameController', ['$scope', '$http', 'WebSocketConnection',
 	//Position dots on game field
 	$scope.computeCellPos = function(cellNumber) {
 		var coordinates = computeRowCol(cellNumber);
-		return ("top: " +coordinates.row + "px; left: " + coordinates.col + "px;");
+		return ("top: " + coordinates.row + "px; left: " 
+				+ coordinates.col + "px;");
 	}
 
 
@@ -122,7 +124,6 @@ dotsGame.controller('GameController', ['$scope', '$http', 'WebSocketConnection',
         for (var j = 0;
          j < edgeEnumerationArray.length;
          j++) {
-            console.log('converting array ' + edgeEnumeration);
             var edgeEnumeration = edgeEnumerationArray[j]
             var i = 0;
             while (++i < edgeEnumeration.length) {
@@ -137,7 +138,6 @@ dotsGame.controller('GameController', ['$scope', '$http', 'WebSocketConnection',
                 to: edgeEnumeration[edgeEnumeration.length - 1]
             });
         }
-        console.log('vertices array ' + edgeEnumerationArray + ' converted to ' + adjacentVertices);
         return adjacentVertices;
     }
 
@@ -166,8 +166,11 @@ dotsGame.controller('GameController', ['$scope', '$http', 'WebSocketConnection',
 
 
         //set game flow flags
-        $scope.gameInProgress = data.gameInProgress;
+        $scope.gameTerminated = data.gameTerminated;
         $scope.moveAllowed = data.moveAllowed;
+        if (data.infoMessage != undefined) {
+        	$scope.infoMessage = data.infoMessage;        	
+        }
         $scope.$apply();
         console.log('View update finished');
     }

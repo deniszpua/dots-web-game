@@ -8,7 +8,7 @@ import java.util.List;
  * display board and current game status.
  */
 public class GameViewUpdate {
-    private boolean gameInProgress;
+    private boolean gameTerminated;
     private boolean moveAllowed;
     private int[] redDots;
     private int[] blueDots;
@@ -16,8 +16,8 @@ public class GameViewUpdate {
     private int[][] blueCircuits;
     private String infoMessage;
 
-    public void setGameInProgress(boolean gameInProgress) {
-        this.gameInProgress = gameInProgress;
+    public void setGameInProgress(boolean gameTerminated) {
+        this.gameTerminated = gameTerminated;
     }
 
     public void setMoveAllowed(boolean moveAllowed) {
@@ -41,7 +41,7 @@ public class GameViewUpdate {
     }
 
     public boolean isGameInProgress() {
-        return gameInProgress;
+        return gameTerminated;
     }
 
     public boolean isMoveAllowed() {
@@ -92,7 +92,7 @@ public class GameViewUpdate {
     @Override
     public String toString() {
         return "GameViewUpdate{" +
-                "gameInProgress=" + gameInProgress +
+                "gameTerminated=" + gameTerminated +
                 ", moveAllowed=" + moveAllowed +
                 ", redDots=" + Arrays.toString(redDots) +
                 ", blueDots=" + Arrays.toString(blueDots) +

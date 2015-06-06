@@ -77,8 +77,9 @@
 </div>
 <!-- game status data -->
 <div class="game-flow-data">
-    {{'Game ' + (gameInProgress? 'in progress\n' : 'terminated\n')  +
-    (moveAllowed? 'your move' : "waiting for opponent's move")}}
+    <p>{{infoMessage}}</p>
+    <p>{{'Game ' + (gameTerminated? 'terminated.' : 'in progress.')}}</p>
+    <p>{{(moveAllowed? 'Your move' : "Waiting for opponent's move")}}</p>
     </div>
 </body>
 </html>
