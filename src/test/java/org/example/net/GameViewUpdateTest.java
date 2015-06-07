@@ -1,6 +1,6 @@
 package org.example.net;
 
-import org.example.net.messages.GameViewUpdate;
+import org.example.net.messaging.GameViewUpdate;
 import org.junit.Before;
 import org.junit.Test;
 

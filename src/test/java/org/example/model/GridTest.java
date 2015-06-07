@@ -28,7 +28,7 @@ public class GridTest {
         //fill two upper rows with dots
         for (int pos = 0; pos < 20; pos++) {
             gameGrid.addDot(
-                    ((pos%2 == 0) ? Player.RED_PLAYER : Player.BLUE_PLAYER),
+                    ((pos%2 == 0) ? PlayerType.RED_PLAYER : PlayerType.BLUE_PLAYER),
                     pos
             );
         }
@@ -43,11 +43,11 @@ public class GridTest {
         //empty board should not contain any elements
         GameGrid emptyGameGrid = new Grid(10, 10);
         //new GameBoard should not contain any dots
-        assertEquals(new ArrayList<Integer>(), emptyGameGrid.getDots(Player.RED_PLAYER));
-        assertEquals(new ArrayList<Integer>(), emptyGameGrid.getDots(Player.BLUE_PLAYER));
+        assertEquals(new ArrayList<Integer>(), emptyGameGrid.getDots(PlayerType.RED_PLAYER));
+        assertEquals(new ArrayList<Integer>(), emptyGameGrid.getDots(PlayerType.BLUE_PLAYER));
         //new GameBoard should not contain any circuits
-        assertEquals(new ArrayList<List<Integer>>(), emptyGameGrid.getCircuits(Player.RED_PLAYER));
-        assertEquals(new ArrayList<List<Integer>>(), emptyGameGrid.getCircuits(Player.BLUE_PLAYER));
+        assertEquals(new ArrayList<List<Integer>>(), emptyGameGrid.getCircuits(PlayerType.RED_PLAYER));
+        assertEquals(new ArrayList<List<Integer>>(), emptyGameGrid.getCircuits(PlayerType.BLUE_PLAYER));
         //empty board score should be zero-filled array
         int[] threeZero = {0, 0, 0};
         List<Integer> expectedScore = new ArrayList<Integer>(3);
@@ -69,22 +69,22 @@ public class GridTest {
         for (int pos = 0; pos < 20; pos+= 2) {
             expected.add(pos);
         }
-        assertEquals(expected, gameGrid.getDots(Player.RED_PLAYER));
+        assertEquals(expected, gameGrid.getDots(PlayerType.RED_PLAYER));
 
         // board should contain blue dots in odd positions of first two rows
         expected.clear();
         for (int pos = 1; pos < 20; pos+= 2) {
             expected.add(pos);
         }
-        assertEquals(expected, gameGrid.getDots(Player.BLUE_PLAYER));
+        assertEquals(expected, gameGrid.getDots(PlayerType.BLUE_PLAYER));
     }
 
     @Test
     public void testGetCircuits() throws Exception {
         //initialized board should not contain circuits
         GameGrid gameGrid = boardSetUp();
-        assertEquals(0, gameGrid.getCircuits(Player.RED_PLAYER).size());
-        assertEquals(0, gameGrid.getCircuits(Player.BLUE_PLAYER).size());
+        assertEquals(0, gameGrid.getCircuits(PlayerType.RED_PLAYER).size());
+        assertEquals(0, gameGrid.getCircuits(PlayerType.BLUE_PLAYER).size());
 
     }
 
@@ -94,17 +94,17 @@ public class GridTest {
      */
     public void testAddDot() throws Exception {
         GameGrid gameGrid = new Grid(10, 10);
-        assertFalse(gameGrid.getDots(Player.RED_PLAYER).contains(21));
-        gameGrid.addDot(Player.RED_PLAYER, 21);
-        assertTrue(gameGrid.getDots(Player.RED_PLAYER).contains(21));
+        assertFalse(gameGrid.getDots(PlayerType.RED_PLAYER).contains(21));
+        gameGrid.addDot(PlayerType.RED_PLAYER, 21);
+        assertTrue(gameGrid.getDots(PlayerType.RED_PLAYER).contains(21));
 
-        assertFalse(gameGrid.getDots(Player.BLUE_PLAYER).contains(0));
-        gameGrid.addDot(Player.BLUE_PLAYER, 0);
-        assertTrue(gameGrid.getDots(Player.BLUE_PLAYER).contains(0));
+        assertFalse(gameGrid.getDots(PlayerType.BLUE_PLAYER).contains(0));
+        gameGrid.addDot(PlayerType.BLUE_PLAYER, 0);
+        assertTrue(gameGrid.getDots(PlayerType.BLUE_PLAYER).contains(0));
 
-        assertFalse(gameGrid.getDots(Player.RED_PLAYER).contains(99));
-        gameGrid.addDot(Player.RED_PLAYER, 99);
-        assertTrue(gameGrid.getDots(Player.RED_PLAYER).contains(99));
+        assertFalse(gameGrid.getDots(PlayerType.RED_PLAYER).contains(99));
+        gameGrid.addDot(PlayerType.RED_PLAYER, 99);
+        assertTrue(gameGrid.getDots(PlayerType.RED_PLAYER).contains(99));
     }
 
     @Test
@@ -115,12 +115,12 @@ public class GridTest {
         GameGrid gameGridWithCircuit = new Grid(10, 10);
         int[] blueDots = {21, 29, 30, 32};
         for (int dot : blueDots) {
-            gameGridWithCircuit.addDot(Player.BLUE_PLAYER, dot);
+            gameGridWithCircuit.addDot(PlayerType.BLUE_PLAYER, dot);
         }
-        gameGridWithCircuit.addDot(Player.RED_PLAYER, 31);
+        gameGridWithCircuit.addDot(PlayerType.RED_PLAYER, 31);
 
-        assertTrue(gameGridWithCircuit.getCircuits(Player.BLUE_PLAYER).size() == 0);
-        gameGridWithCircuit.addDot(Player.BLUE_PLAYER, 41);
+        assertTrue(gameGridWithCircuit.getCircuits(PlayerType.BLUE_PLAYER).size() == 0);
+        gameGridWithCircuit.addDot(PlayerType.BLUE_PLAYER, 41);
 
         int [] expectedCircuitVertices = {21, 30, 32, 41};
         List<Integer> expectedCircuit = new ArrayList<Integer>();
@@ -129,7 +129,7 @@ public class GridTest {
         }
         Collections.sort(expectedCircuit);
 
-        List<List<Integer>> actualCircuits = gameGridWithCircuit.getCircuits(Player.BLUE_PLAYER);
+        List<List<Integer>> actualCircuits = gameGridWithCircuit.getCircuits(PlayerType.BLUE_PLAYER);
         assertEquals(1, actualCircuits.size());
         List<Integer> actual =  actualCircuits.get(0);
         Collections.sort(actual);
@@ -146,18 +146,18 @@ public class GridTest {
         int [] redDots = {27, 29, 36, 69, 93};
         GameGrid gameGrid = new Grid(10, 10);
         for (int blueDot : blueDots) {
-            gameGrid.addDot(Player.BLUE_PLAYER, blueDot);
+            gameGrid.addDot(PlayerType.BLUE_PLAYER, blueDot);
         }
         for (int redDot : redDots) {
-            gameGrid.addDot(Player.RED_PLAYER, redDot);
+            gameGrid.addDot(PlayerType.RED_PLAYER, redDot);
         }
 
 
         List<Integer> expectedScore = Arrays.asList(0, 0, 0);
         assertEquals(expectedScore, gameGrid.getGameScore());
 
-        expectedScore.set(Player.BLUE_PLAYER, 1);
-        gameGrid.addDot(Player.BLUE_PLAYER, blueClosingPoint);
+        expectedScore.set(PlayerType.BLUE_PLAYER, 1);
+        gameGrid.addDot(PlayerType.BLUE_PLAYER, blueClosingPoint);
         assertEquals(expectedScore, gameGrid.getGameScore());
 
     }
@@ -172,14 +172,14 @@ public class GridTest {
         int redCircuitClosingDot = 72;
         GameGrid gameGrid = new Grid(10, 10);
         for (int dot : redDots) {
-            gameGrid.addDot(Player.RED_PLAYER, dot);
+            gameGrid.addDot(PlayerType.RED_PLAYER, dot);
         }
         for (int dot : blueDots) {
-            gameGrid.addDot(Player.BLUE_PLAYER, dot);
+            gameGrid.addDot(PlayerType.BLUE_PLAYER, dot);
         }
-        assertEquals(0, gameGrid.getCircuits(Player.RED_PLAYER).size());
+        assertEquals(0, gameGrid.getCircuits(PlayerType.RED_PLAYER).size());
 
-        gameGrid.addDot(Player.RED_PLAYER, redCircuitClosingDot);
+        gameGrid.addDot(PlayerType.RED_PLAYER, redCircuitClosingDot);
         int[] expectedVertices = {13, 22, 24, 31, 35, 41, 45, 50, 55, 61, 66, 72, 73, 76, 84, 85};
         List<Integer> expectedCircuit = new ArrayList<Integer>();
         for (int dot : expectedVertices) {
@@ -187,8 +187,8 @@ public class GridTest {
         }
         Collections.sort(expectedCircuit);
 
-        assertEquals(1, gameGrid.getCircuits(Player.RED_PLAYER).size());
-        List<Integer> actualCircuit = gameGrid.getCircuits(Player.RED_PLAYER).get(0);
+        assertEquals(1, gameGrid.getCircuits(PlayerType.RED_PLAYER).size());
+        List<Integer> actualCircuit = gameGrid.getCircuits(PlayerType.RED_PLAYER).get(0);
         Collections.sort(actualCircuit);
         assertEquals(expectedCircuit, actualCircuit);
     }
@@ -212,7 +212,7 @@ public class GridTest {
         //negative position
         thrown = false;
         try {
-            gameGrid.addDot(Player.RED_PLAYER, -1);
+            gameGrid.addDot(PlayerType.RED_PLAYER, -1);
         }
         catch (IllegalArgumentException e) {
             thrown = true;
@@ -221,7 +221,7 @@ public class GridTest {
         //exceeding range
         thrown = false;
         try {
-            gameGrid.addDot(Player.BLUE_PLAYER, 105);
+            gameGrid.addDot(PlayerType.BLUE_PLAYER, 105);
         }
         catch (IllegalArgumentException e) {
             thrown = true;

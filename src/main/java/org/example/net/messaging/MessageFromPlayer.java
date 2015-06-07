@@ -1,4 +1,4 @@
-package org.example.net.messages;
+package org.example.net.messaging;
 
 /**
  * Bean, that represents player response data.
