@@ -1,4 +1,4 @@
-package org.example.net.messages;
+package org.example.net.messaging;
 
 import java.util.Arrays;
 import java.util.List;

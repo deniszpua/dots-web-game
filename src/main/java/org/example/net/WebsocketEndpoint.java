@@ -20,12 +20,11 @@ import javax.websocket.server.ServerEndpoint;
 @ServerEndpoint(value = "/msg")
 public class WebsocketEndpoint {
 
-  public static final String GUEST_PREFIX = 
-      Messages.getString("WebsocketEndpoint.NICKNAME_PREFIX"); //$NON-NLS-1$
+  public static final String GUEST_PREFIX = "Player ";
   public static final String ERROR_ON_SOCKET_CONNECTION = 
-      Messages.getString("WebsocketEndpoint.ERROR_ON_WSOCKET"); //$NON-NLS-1$
+      "Error on socket %s connection.";
   public static final String PLAYER_HAS_DISCONNECTED = 
-      Messages.getString("WebsocketEndpoint.PLAYER_DISCONNECTED"); //$NON-NLS-1$
+     "Player %s has disconnected.";
   
   private static final AtomicInteger connectionIds = new AtomicInteger(0);
   private static final List<WebsocketEndpoint> connections =
@@ -48,9 +47,8 @@ public class WebsocketEndpoint {
     this.session = session;
     connections.add(this);
     Logger logger = Logger.getGlobal();
-    logger.info(String.format(Messages.getString(
-        "WebsocketEndpoint.CONNECTED"), nickname
-    )); //$NON-NLS-1$
+    logger.info(String.format("%s connected", nickname
+    ));
 
     //detect when second player connected and launch new game
     if (connections.size() >= 2) {
@@ -65,9 +63,7 @@ public class WebsocketEndpoint {
           gameStarted = true;
         }
         if (gameStarted) {
-          logger.info(Messages.getString(
-              "WebsocketEndpoint.NEW_GAME_STARTED"
-          )); //$NON-NLS-1$
+          logger.info("New game started"); 
         }
       }
     }
@@ -88,7 +84,7 @@ public class WebsocketEndpoint {
     //notify listener
     listener.messageReceived(message);
     Logger.getGlobal().info(String.format(
-        Messages.getString("WebsocketEndpoint.MESSAGE_RECEIVED"), message, nickname
+        "Message %s received from %s\n", message, nickname
     )); //$NON-NLS-1$
   }
 

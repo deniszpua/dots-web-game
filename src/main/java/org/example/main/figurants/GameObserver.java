@@ -1,6 +1,6 @@
 package org.example.main.figurants;
 
-import org.example.net.messages.GameViewUpdate;
+import org.example.net.messaging.GameViewUpdate;
 
 
 /**

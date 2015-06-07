@@ -3,8 +3,8 @@ package org.example.main.figurants;
 import org.example.main.MovesReceiver;
 import org.example.net.WebsocketEndpoint;
 import org.example.net.WebsocketListener;
-import org.example.net.messages.GameViewUpdate;
-import org.example.net.messages.MessageFromPlayer;
+import org.example.net.messaging.GameViewUpdate;
+import org.example.net.messaging.MessageFromPlayer;
 
 import java.io.IOException;
 
@@ -44,8 +44,8 @@ public class WebsocketPlayer extends WebsocketGameObserver implements Player,
       e.printStackTrace();
       GameViewUpdate moveRequest = new GameViewUpdate();
       moveRequest.setMoveAllowed(true);
-      moveRequest.setInfoMessage(Messages.getString(
-          "WebsocketPlayer.REPEAT_MOVE")); //$NON-NLS-1$
+      moveRequest.setInfoMessage("Error reading your previous"
+          + " move, please repeat it.");
       try {
         ws.getSession().getBasicRemote().sendText(
             mapper.writeValueAsString(moveRequest));
@@ -66,9 +66,7 @@ public class WebsocketPlayer extends WebsocketGameObserver implements Player,
 
   @Override
   public void connectionTerminated() {
-    listener.connectionTerminated(
-        Messages.getString("WebsocketPlayer.CONNECTION_TERMINATED"),
-        nickname); //$NON-NLS-1$
+    listener.connectionTerminated("Player teminated connection", nickname);
         
   }
 

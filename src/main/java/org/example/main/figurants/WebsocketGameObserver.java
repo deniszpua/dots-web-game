@@ -2,7 +2,7 @@ package org.example.main.figurants;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.example.net.WebsocketEndpoint;
-import org.example.net.messages.GameViewUpdate;
+import org.example.net.messaging.GameViewUpdate;
 
 import java.io.IOException;
 

@@ -1,6 +1,6 @@
 package org.example.main;
 
-import org.example.net.messages.MessageFromPlayer;
+import org.example.net.messaging.MessageFromPlayer;
 
 
 public interface MovesReceiver {

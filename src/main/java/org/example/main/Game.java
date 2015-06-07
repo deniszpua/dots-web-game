@@ -4,8 +4,8 @@ import org.example.main.figurants.GameObserver;
 import org.example.main.figurants.Player;
 import org.example.model.GameGrid;
 import org.example.model.PlayerType;
-import org.example.net.messages.GameViewUpdate;
-import org.example.net.messages.MessageFromPlayer;
+import org.example.net.messaging.GameViewUpdate;
+import org.example.net.messaging.MessageFromPlayer;
 
 import java.util.Set;
 import java.util.logging.Logger;
@@ -138,10 +138,19 @@ public class Game implements Launcher {
   }
 
   private void broadCastView(String infoMessage, boolean gameInProgress) {
+	  System.out.println("Entered broadCastView method");
     GameViewUpdate data = getCurrentGameDataSnapshot();
     data.setGameInProgress(false);
     data.setInfoMessage(infoMessage);
-    for (GameObserver watcher : watchers) {
+    System.out.println("Constructed data message: " + data);
+    if (watchers != null) {
+    	for (GameObserver watcher : watchers) {
+        	System.out.println("About to send message" + watcher);
+          watcher.receiveNewGameState(data);
+        }
+    }
+    for (GameObserver watcher : players) {
+    	System.out.println("About to send message" + watcher);
       watcher.receiveNewGameState(data);
     }
   }
