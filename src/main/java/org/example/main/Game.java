@@ -138,19 +138,15 @@ public class Game implements Launcher {
   }
 
   private void broadCastView(String infoMessage, boolean gameInProgress) {
-	  System.out.println("Entered broadCastView method");
     GameViewUpdate data = getCurrentGameDataSnapshot();
     data.setGameInProgress(false);
     data.setInfoMessage(infoMessage);
-    System.out.println("Constructed data message: " + data);
     if (watchers != null) {
     	for (GameObserver watcher : watchers) {
-        	System.out.println("About to send message" + watcher);
           watcher.receiveNewGameState(data);
         }
     }
     for (GameObserver watcher : players) {
-    	System.out.println("About to send message" + watcher);
       watcher.receiveNewGameState(data);
     }
   }
